@@ -1,25 +1,66 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React, { useState, useEffect } from 'react';
+// import { useToasts } from 'react-toast-notifications';
 
-function App() {
+import './App.css';
+import MedicineForm from './medicine reminder/medicineform';
+import MedicineList from './medicine reminder/medicinelist';
+
+
+const App = () => {
+  // const { addToast } = useToasts();
+  const [medicines, setMedicines] = useState([]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      checkReminders();
+    }, 1000); // Check reminders every second (adjust as needed)
+
+    return () => clearInterval(intervalId);
+  }, [medicines]);
+
+  const addMedicine = (newMedicine) => {
+    setMedicines((prevMedicines) => [...prevMedicines, newMedicine]);
+  };
+
+  const deleteMedicine = (index) => {
+    setMedicines((prevMedicines) => prevMedicines.filter((_, i) => i !== index));
+  };
+
+  const checkReminders = () => {
+    const now = new Date();
+    const upcomingReminders = medicines.filter((medicine) => {
+      const reminderTime = new Date(medicine.reminder);
+      return reminderTime > now && reminderTime - now <= 1000; // Within the next second
+    });
+
+    if (upcomingReminders.length > 0) {
+      showReminderNotification(upcomingReminders);
+    }
+  };
+
+  const showReminderNotification = (medicines) => {
+   
+
+    medicines.forEach((medicine) => {
+      alert(`It's time to take ${medicine.name} - ${medicine.dosage}!`);
+      
+    });
+  };
+  
+
+ 
+
+      
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h1>Medicine Reminder</h1>
+      
+      <MedicineForm onAdd={addMedicine} />
+      <MedicineList medicines={medicines} onDelete={deleteMedicine} />
     </div>
   );
-}
+};
 
 export default App;
